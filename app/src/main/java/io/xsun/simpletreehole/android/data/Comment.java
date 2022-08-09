@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class Comment {
     private long id;
     private UserProfile sender;
     private LocalDateTime createTime;
     private String content;
-    private Set<Comment> comments;
+    private Post post;
     private Set<UserProfile> likers;
 }

@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import io.xsun.simpletreehole.android.databinding.ActivityMainBinding;
-import io.xsun.simpletreehole.android.ui.post.PostDetailFragment;
-import io.xsun.simpletreehole.android.ui.post.PostListFragment;
+import io.xsun.simpletreehole.android.ui.PostDetailFragment;
+import io.xsun.simpletreehole.android.ui.PostListFragment;
 
 public class MainActivity extends AppCompatActivity {
 

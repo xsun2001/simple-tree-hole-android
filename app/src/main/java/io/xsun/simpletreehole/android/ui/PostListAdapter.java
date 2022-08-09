@@ -1,4 +1,4 @@
-package io.xsun.simpletreehole.android.ui.post;
+package io.xsun.simpletreehole.android.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 import io.xsun.simpletreehole.android.R;
@@ -43,6 +44,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView senderName, createTime, postContent, likeCount;
+        private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -55,20 +57,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
         public void bindData(int position) {
             var post = postList.get(position);
             senderName.setText(post.getSenderName());
-            createTime.setText(post.getCreateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            createTime.setText(post.getCreateTime().format(formatter));
             postContent.setText(post.getContent());
             likeCount.setText(Integer.toString(post.getLikeCount()));
         }
-    }
-
-    public void appendPosts(List<Post> posts) {
-        int start = postList.size(), length = posts.size();
-        postList.addAll(posts);
-        notifyItemRangeInserted(start, length);
-    }
-
-    public void setPosts(List<Post> posts) {
-        postList = posts;
-        notifyDataSetChanged();
     }
 }

@@ -1,4 +1,4 @@
-package io.xsun.simpletreehole.android.ui.post;
+package io.xsun.simpletreehole.android.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,12 +18,8 @@ import java.util.List;
 
 import io.xsun.simpletreehole.android.R;
 import io.xsun.simpletreehole.android.data.Post;
-import io.xsun.simpletreehole.android.service.PostService;
-import io.xsun.simpletreehole.android.service.Services;
-import io.xsun.simpletreehole.android.ui.EndlessRecyclerViewScrollListener;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.xsun.simpletreehole.android.service.PostCommentService;
+import io.xsun.simpletreehole.android.service.TaskRunner;
 
 public class PostListFragment extends Fragment {
 
@@ -39,7 +34,6 @@ public class PostListFragment extends Fragment {
     private Context context;
     private ProgressBar loadingBar;
     private SwipeRefreshLayout listContainer;
-    private PostService service = Services.getPostService();
 
     public PostListFragment() {
     }
@@ -71,56 +65,37 @@ public class PostListFragment extends Fragment {
         return view;
     }
 
-
     private void loadNextPage() {
         loadingBar.setVisibility(View.VISIBLE);
-        service.postList(postList.size(), PAGE_SIZE).enqueue(new PostFetchCallback(false));
+        PostCommentService.getInstance().postList(postList.size(), PAGE_SIZE, new PostFetchCallback(false));
     }
 
     private void reloadPost() {
         listScrollListener.resetState();
-        service.postList(0, PAGE_SIZE).enqueue(new PostFetchCallback(true));
+        PostCommentService.getInstance().postList(0, PAGE_SIZE, new PostFetchCallback(true));
     }
 
-    public class PostFetchCallback implements Callback<List<Post>> {
+    public class PostFetchCallback implements TaskRunner.Callback<List<Post>> {
         private final boolean reload;
 
         public PostFetchCallback(boolean reload) {
             this.reload = reload;
         }
 
-        private void finishLoading() {
+        @Override
+        public void complete(TaskRunner.Result<List<Post>> res) {
             loadingBar.setVisibility(View.GONE);
             if (reload) {
                 listContainer.setRefreshing(false);
             }
-        }
-
-        @Override
-        public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
-            finishLoading();
-            if (response.isSuccessful()) {
-                var newList = response.body();
-                if (newList == null) {
-                    Log.w(LOG_TAG, "Response body is null");
-                } else {
-                    if (reload) {
-                        postList.clear();
-                    }
-                    postList.addAll(newList);
-                    listAdapter.notifyDataSetChanged();
+            if (res.isOk()) {
+                if (reload) {
+                    postList.clear();
                 }
+                postList.addAll(res.getResult());
             } else {
-                var errToast = Toast.makeText(context, "Fetch post failed: " + response.code(), Toast.LENGTH_SHORT);
-                errToast.show();
-                Log.w(LOG_TAG, "Post fetch failed: " + response.code());
+                Log.e(LOG_TAG, "Post fetch failed due to exception", res.getError());
             }
-        }
-
-        @Override
-        public void onFailure(Call<List<Post>> call, Throwable t) {
-            finishLoading();
-            Log.e(LOG_TAG, "Post fetch failed due to exception", t);
         }
     }
 
