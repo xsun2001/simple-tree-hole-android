@@ -70,9 +70,6 @@ public class UserProfileFragment extends Fragment {
 
     private void onLogout(View view) {
         UserService.getInstance().logout(view.getContext());
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, PostListFragment.class, null)
-                .addToBackStack(null)
-                .commit();
+        Utils.replaceFragment(this, PostListFragment.class);
     }
 }

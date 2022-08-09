@@ -45,10 +45,7 @@ public class RegisterFragment extends Fragment {
                 result -> {
                     register.setClickable(true);
                     if (result.isOk()) {
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragmentContainer, LoginFragment.class, null)
-                                .addToBackStack(null)
-                                .commit();
+                        Utils.replaceFragment(this, LoginFragment.class);
                         Toast.makeText(getContext(), "Register success", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getContext(), "Register failed: " + result.getError().getMessage(), Toast.LENGTH_SHORT).show();

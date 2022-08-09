@@ -52,10 +52,7 @@ public class LoginFragment extends Fragment {
 
     private void onLoginResult(TaskRunner.Result<Long> callback) {
         if (callback.isOk()) {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, PostListFragment.class, null)
-                    .addToBackStack(null)
-                    .commit();
+            Utils.replaceFragment(this, PostListFragment.class);
             Toast.makeText(getContext(), "Logged in", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getContext(), "Cannot log in: " + callback.getError().getMessage(), Toast.LENGTH_SHORT).show();

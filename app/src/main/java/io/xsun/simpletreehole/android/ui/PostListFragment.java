@@ -63,15 +63,9 @@ public class PostListFragment extends Fragment {
         loadingBar.setVisibility(View.VISIBLE);
         reloadPost();
 
-        view.findViewById(R.id.add_post).setOnClickListener(v -> getParentFragmentManager()
-                .beginTransaction()
-                .replace(
-                        R.id.fragmentContainer,
-                        UserService.getInstance().getLoggedUser(v.getContext()) == null ?
-                                LoginFragment.class : CreatePostFragment.class,
-                        null)
-                .addToBackStack(null)
-                .commit());
+        view.findViewById(R.id.add_post).setOnClickListener(v ->
+                Utils.replaceFragment(this, UserService.getInstance().getLoggedUser(v.getContext()) == null ?
+                        LoginFragment.class : CreatePostFragment.class));
 
         return view;
     }

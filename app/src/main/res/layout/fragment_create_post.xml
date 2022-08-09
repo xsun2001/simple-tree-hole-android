@@ -7,7 +7,7 @@
     tools:context=".ui.CreatePostFragment">
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/create_post_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
@@ -17,18 +17,19 @@
         android:gravity="start|top"
         android:hint="Please input post content"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
+        app:layout_constraintBottom_toTopOf="@+id/create_post_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/create_post_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
+        android:backgroundTint="#43A047"
         android:text="post"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
