@@ -2,9 +2,13 @@ package io.xsun.simpletreehole.android.data;
 
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProfile {
     private long id;
     private String email, nickname;

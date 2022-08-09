@@ -1,5 +1,9 @@
 package io.xsun.simpletreehole.android.service;
 
+import static io.xsun.simpletreehole.android.BuildConfig.APPLICATION_ID;
+
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,18 +71,46 @@ public final class UserService {
         }
     }
 
-    public void login(String email, String password, TaskRunner.Callback<Long> callback) {
+    public void login(Context context, String email, String password, TaskRunner.Callback<Long> callback) {
         TaskRunner.getInstance().execute(() -> {
             if (Objects.equals(authMap.get(email), password)) {
-                return Objects.requireNonNull(emailMap.get(email)).getId();
+                var id = Objects.requireNonNull(emailMap.get(email)).getId();
+                var pref = context.getSharedPreferences(APPLICATION_ID + "user", Context.MODE_PRIVATE);
+                pref.edit().putLong("id", id).apply();
+                return id;
             } else {
                 throw new NoSuchEmailOrPasswordException(email);
             }
         }, callback);
     }
 
-    public void userProfile(Long id, TaskRunner.Callback<UserProfile> callback) {
+    public void logout(Context context) {
+        var pref = context.getSharedPreferences(APPLICATION_ID + "user", Context.MODE_PRIVATE);
+        pref.edit().clear().apply();
+    }
+
+    public UserProfile getLoggedUser(Context context) {
+        var pref = context.getSharedPreferences(APPLICATION_ID + "user", Context.MODE_PRIVATE);
+        var id = pref.getLong("id", -1);
+        return idMap.get(id);
+    }
+
+    public void getUserProfile(Long id, TaskRunner.Callback<UserProfile> callback) {
         TaskRunner.getInstance().execute(() -> idMap.get(id), callback);
+    }
+
+    public void updateUserProfile(Long id, String email, String nickname, TaskRunner.Callback<UserProfile> callback) {
+        TaskRunner.getInstance().execute(() -> {
+            var profile = Objects.requireNonNull(idMap.get(id));
+            if (!profile.getEmail().equals(email) && emailMap.containsKey(email)) {
+                throw new DuplicateEmailException(email);
+            }
+            emailMap.remove(profile.getEmail());
+            profile.setEmail(email);
+            profile.setNickname(nickname);
+            emailMap.put(email, profile);
+            return profile;
+        }, callback);
     }
 
     Map<String, UserProfile> getEmailMap() {

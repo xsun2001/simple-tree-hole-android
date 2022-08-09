@@ -20,6 +20,7 @@ import io.xsun.simpletreehole.android.R;
 import io.xsun.simpletreehole.android.data.Post;
 import io.xsun.simpletreehole.android.service.PostCommentService;
 import io.xsun.simpletreehole.android.service.TaskRunner;
+import io.xsun.simpletreehole.android.service.UserService;
 
 public class PostListFragment extends Fragment {
 
@@ -61,6 +62,16 @@ public class PostListFragment extends Fragment {
         loadingBar = view.findViewById(R.id.loading_bar);
         loadingBar.setVisibility(View.VISIBLE);
         reloadPost();
+
+        view.findViewById(R.id.add_post).setOnClickListener(v -> getParentFragmentManager()
+                .beginTransaction()
+                .replace(
+                        R.id.fragmentContainer,
+                        UserService.getInstance().getLoggedUser(v.getContext()) == null ?
+                                LoginFragment.class : CreatePostFragment.class,
+                        null)
+                .addToBackStack(null)
+                .commit());
 
         return view;
     }
