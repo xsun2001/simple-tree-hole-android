@@ -44,10 +44,18 @@ public final class UserService {
         }
     }
 
+    public static class TooWeakPasswordException extends RuntimeException {
+        public TooWeakPasswordException() {
+            super("Too weak password");
+        }
+    }
+
     public void register(String email, String nickname, String password, TaskRunner.Callback<Long> callback) {
         TaskRunner.getInstance().execute(() -> {
             if (emailMap.containsKey(email)) {
                 throw new DuplicateEmailException(email);
+            } else if (password.length() < 6) {
+                throw new TooWeakPasswordException();
             } else {
                 authMap.put(email, password);
                 var profile = new UserProfile();
@@ -69,6 +77,7 @@ public final class UserService {
             super("No such email or password: " + email);
             this.email = email;
         }
+
     }
 
     public void login(Context context, String email, String password, TaskRunner.Callback<Long> callback) {

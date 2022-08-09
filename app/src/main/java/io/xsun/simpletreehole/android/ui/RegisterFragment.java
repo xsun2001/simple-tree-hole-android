@@ -1,66 +1,60 @@
 package io.xsun.simpletreehole.android.ui;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import io.xsun.simpletreehole.android.R;
+import io.xsun.simpletreehole.android.service.UserService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RegisterFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class RegisterFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private EditText email, nickname, password;
+    private Button register;
 
     public RegisterFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RegisterFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RegisterFragment newInstance(String param1, String param2) {
-        RegisterFragment fragment = new RegisterFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        var view = inflater.inflate(R.layout.fragment_register, container, false);
+
+        email = view.findViewById(R.id.register_email);
+        nickname = view.findViewById(R.id.register_nickname);
+        password = view.findViewById(R.id.register_password);
+        register = view.findViewById(R.id.register_button);
+
+        register.setOnClickListener(this::onRegister);
+
+        return view;
     }
+
+    private void onRegister(View view) {
+        register.setClickable(false);
+        UserService.getInstance().register(
+                email.getText().toString(),
+                nickname.getText().toString(),
+                password.getText().toString(),
+                result -> {
+                    register.setClickable(true);
+                    if (result.isOk()) {
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragmentContainer, LoginFragment.class, null)
+                                .addToBackStack(null)
+                                .commit();
+                        Toast.makeText(getContext(), "Register success", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Register failed: " + result.getError().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
+
 }
