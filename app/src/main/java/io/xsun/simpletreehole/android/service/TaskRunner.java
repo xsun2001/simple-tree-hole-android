@@ -47,6 +47,10 @@ public class TaskRunner {
     public <R> void execute(Callable<R> task, Callback<R> callback) {
         workers.execute(() -> {
             try {
+                Thread.sleep((long) (Math.random() * 1000));
+            } catch (InterruptedException ignored) {
+            }
+            try {
                 final R res = task.call();
                 uiThread.post(() -> callback.complete(Result.ofResult(res)));
             } catch (Exception e) {

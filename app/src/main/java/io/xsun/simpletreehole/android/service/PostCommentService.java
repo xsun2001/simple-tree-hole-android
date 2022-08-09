@@ -78,7 +78,7 @@ public final class PostCommentService {
         TaskRunner.getInstance().execute(() -> {
             var list = new ArrayList<>(posts.values());
             list.sort(Comparator.comparing(Post::getId).reversed());
-            return list.subList(offset, offset + pageSize);
+            return list.subList(offset, Math.min(list.size(), offset + pageSize));
         }, callback);
     }
 

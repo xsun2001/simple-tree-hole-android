@@ -56,10 +56,10 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
         public void bindData(int position) {
             var post = postList.get(position);
-            senderName.setText(post.getSenderName());
+            senderName.setText(post.getSender().getNickname());
             createTime.setText(post.getCreateTime().format(formatter));
             postContent.setText(post.getContent());
-            likeCount.setText(Integer.toString(post.getLikeCount()));
+            likeCount.setText(Integer.toString(post.getLikers().size()));
         }
     }
 }
