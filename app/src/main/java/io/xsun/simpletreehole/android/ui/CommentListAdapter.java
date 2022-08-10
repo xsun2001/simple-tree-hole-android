@@ -1,30 +1,24 @@
 package io.xsun.simpletreehole.android.ui;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.List;
 
 import io.xsun.simpletreehole.android.R;
-import io.xsun.simpletreehole.android.data.Post;
+import io.xsun.simpletreehole.android.data.Comment;
 
-public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHolder> {
-    private List<Post> postList;
-    private final Fragment fragment;
+public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHolder> {
+    private List<Comment> postList;
     private final LayoutInflater inflater;
 
-    public PostListAdapter(Fragment fragment, Context context, List<Post> postList) {
-        this.fragment = fragment;
+    public CommentListAdapter(Context context, List<Comment> postList) {
         this.inflater = LayoutInflater.from(context);
         this.postList = postList;
     }
@@ -32,7 +26,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        var itemView = inflater.inflate(R.layout.post_item, parent, false);
+        var itemView = inflater.inflate(R.layout.comment_item, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -48,7 +42,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView senderName, createTime, postContent, likeCount;
-        private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -61,15 +54,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
         public void bindData(int position) {
             var post = postList.get(position);
             senderName.setText(post.getSender().getNickname());
-            createTime.setText(post.getCreateTime().format(formatter));
+            createTime.setText(post.getCreateTime().format(Utils.DATE_TIME_FORMATTER));
             postContent.setText(post.getContent());
             likeCount.setText(Integer.toString(post.getLikers().size()));
-
-            postContent.setOnClickListener(v -> {
-                var bundle = new Bundle();
-                bundle.putLong("postId", post.getId());
-                Utils.replaceFragment(fragment, PostDetailFragment.class, bundle);
-            });
         }
     }
 }

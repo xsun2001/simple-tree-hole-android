@@ -82,6 +82,18 @@ public final class PostCommentService {
         }, callback);
     }
 
+    public void getPost(long id, TaskRunner.Callback<Post> callback) {
+        TaskRunner.getInstance().execute(() -> Objects.requireNonNull(posts.get(id)), callback);
+    }
+
+    public void commentList(long postId, int offset, int pageSize, TaskRunner.Callback<List<Comment>> callback) {
+        TaskRunner.getInstance().execute(() -> {
+            var list = new ArrayList<>(Objects.requireNonNull(posts.get(postId)).getComments());
+            list.sort(Comparator.comparing(Comment::getId).reversed());
+            return list.subList(offset, Math.min(list.size(), offset + pageSize));
+        }, callback);
+    }
+
     private PostCommentService() {
         var random = new Random();
         for (int i = 0; i < 100; i++) {

@@ -50,13 +50,13 @@ public class PostListFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.post_list);
 
-        LinearLayoutManager llm = new LinearLayoutManager(context);
+        var llm = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(llm);
 
         listScrollListener = new EndlessRecyclerViewScrollListener(llm, (page, totalItemsCount, view1) -> loadNextPage());
         recyclerView.addOnScrollListener(listScrollListener);
 
-        listAdapter = new PostListAdapter(context, postList);
+        listAdapter = new PostListAdapter(this, context, postList);
         recyclerView.setAdapter(listAdapter);
 
         loadingBar = view.findViewById(R.id.loading_bar);
