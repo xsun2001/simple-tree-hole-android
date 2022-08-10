@@ -42,11 +42,6 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.posts) {
             replaceFragment(PostListFragment.class);
             return true;
-        } else if (item.getItemId() == R.id.chat) {
-            replaceFragment(
-                    UserService.getInstance().getLoggedUser(this) == null ?
-                            LoginFragment.class : UserProfileFragment.class);
-            return true;
         } else if (item.getItemId() == R.id.user) {
             replaceFragment(
                     UserService.getInstance().getLoggedUser(this) == null ?

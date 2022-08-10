@@ -36,26 +36,26 @@ public final class PostCommentService {
         return comment.getId();
     }
 
-    private static <T> boolean toggle(Collection<T> collection, T t) {
+    private static <T> void toggle(Collection<T> collection, T t) {
         if (collection.contains(t)) {
             collection.remove(t);
-            return false;
         } else {
             collection.add(t);
-            return true;
         }
     }
 
-    private boolean _toggleLikePost(long postId, long userId) {
+    private Post _toggleLikePost(long postId, long userId) {
         var post = Objects.requireNonNull(posts.get(postId));
         var user = Objects.requireNonNull(UserService.getInstance().getIdMap().get(userId));
-        return toggle(post.getLikers(), user);
+        toggle(post.getLikers(), user);
+        return post;
     }
 
-    private boolean _toggleLikeComment(long commentId, long userId) {
+    private Comment _toggleLikeComment(long commentId, long userId) {
         var comment = Objects.requireNonNull(comments.get(commentId));
         var user = Objects.requireNonNull(UserService.getInstance().getIdMap().get(userId));
-        return toggle(comment.getLikers(), user);
+        toggle(comment.getLikers(), user);
+        return comment;
     }
 
     public void createPost(long userId, String content, TaskRunner.Callback<Long> callback) {
@@ -66,11 +66,11 @@ public final class PostCommentService {
         TaskRunner.getInstance().execute(() -> _createComment(postId, userId, content), callback);
     }
 
-    public void toggleLikePost(long postId, long userId, TaskRunner.Callback<Boolean> callback) {
+    public void toggleLikePost(long postId, long userId, TaskRunner.Callback<Post> callback) {
         TaskRunner.getInstance().execute(() -> _toggleLikePost(postId, userId), callback);
     }
 
-    public void toggleLikeComment(long postId, long userId, TaskRunner.Callback<Boolean> callback) {
+    public void toggleLikeComment(long postId, long userId, TaskRunner.Callback<Comment> callback) {
         TaskRunner.getInstance().execute(() -> _toggleLikeComment(postId, userId), callback);
     }
 

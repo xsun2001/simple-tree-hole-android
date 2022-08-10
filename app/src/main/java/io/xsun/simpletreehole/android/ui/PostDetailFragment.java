@@ -1,12 +1,14 @@
 package io.xsun.simpletreehole.android.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ public class PostDetailFragment extends Fragment {
     private long postId;
 
     private TextView postSender, postTime, postLikeCount, postContent;
+    private ImageButton postLikeButton;
 
     private List<Comment> commentList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -69,6 +72,7 @@ public class PostDetailFragment extends Fragment {
         postTime = postHead.findViewById(R.id.create_time);
         postLikeCount = postHead.findViewById(R.id.like_count);
         postContent = postHead.findViewById(R.id.post_content);
+        postLikeButton = postHead.findViewById(R.id.like_button);
 
         loadingBar = view.findViewById(R.id.post_detail_progress);
         commentInput = view.findViewById(R.id.post_detail_comment_input);
@@ -80,11 +84,27 @@ public class PostDetailFragment extends Fragment {
         recyclerView.setLayoutManager(llm);
         listScrollListener = new EndlessRecyclerViewScrollListener(llm, (page, totalItemsCount, view1) -> loadMoreComment());
         recyclerView.addOnScrollListener(listScrollListener);
-        listAdapter = new CommentListAdapter(view.getContext(), commentList);
+        listAdapter = new CommentListAdapter(this, view.getContext(), commentList);
         recyclerView.setAdapter(listAdapter);
 
         listContainer = view.findViewById(R.id.post_list_container);
         listContainer.setOnRefreshListener(this::reloadData);
+
+        var loggedUser = UserService.getInstance().getLoggedUser(requireContext());
+
+        if (loggedUser != null) {
+            postLikeButton.setOnClickListener(v ->
+                    PostCommentService.getInstance().toggleLikePost(postId, loggedUser.getId(), res -> {
+                        if (res.isOk()) {
+                            bindPostData(res.getResult());
+                        } else {
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Toggle post like failed: " + res.getError().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }));
+        }
 
         reloadData();
 
@@ -96,10 +116,7 @@ public class PostDetailFragment extends Fragment {
         public void complete(TaskRunner.Result<Post> res) {
             if (res.isOk()) {
                 var post = res.getResult();
-                postSender.setText(post.getSender().getNickname());
-                postTime.setText(post.getCreateTime().format(Utils.DATE_TIME_FORMATTER));
-                postLikeCount.setText(Integer.toString(post.getLikers().size()));
-                postContent.setText(post.getContent());
+                bindPostData(post);
             } else {
                 postContent.setText("Cannot load post. Please retry.");
                 Toast.makeText(context, "Cannot load post: " + res.getError().getMessage(), Toast.LENGTH_SHORT).show();
@@ -139,11 +156,28 @@ public class PostDetailFragment extends Fragment {
         }
     }
 
-    private void reloadData() {
+    private void bindPostData(Post post) {
+        postSender.setText(post.getSender().getNickname());
+        postTime.setText(post.getCreateTime().format(Utils.DATE_TIME_FORMATTER));
+        postContent.setText(post.getContent());
+        postLikeCount.setText(Integer.toString(post.getLikers().size()));
+
+        var loggedUser = UserService.getInstance().getLoggedUser(requireContext());
+        postLikeButton.setColorFilter(
+                post.getLikers().contains(loggedUser) ? Color.BLUE : Color.BLACK,
+                android.graphics.PorterDuff.Mode.SRC_IN);
+    }
+
+    private void reloadPost() {
         loadPost = true;
-        loadComment = true;
         loadingBar.setVisibility(View.VISIBLE);
         PostCommentService.getInstance().getPost(postId, new LoadPostCallback());
+    }
+
+    private void reloadData() {
+        reloadPost();
+        loadComment = true;
+        loadingBar.setVisibility(View.VISIBLE);
         PostCommentService.getInstance().commentList(postId, 0, PAGE_SIZE, new LoadCommentCallback(true));
     }
 

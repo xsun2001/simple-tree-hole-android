@@ -5,10 +5,6 @@
         android:icon="@drawable/ic_baseline_menu_24"
         android:title="Posts" />
     <item
-        android:id="@+id/chat"
-        android:icon="@drawable/ic_baseline_message_24"
-        android:title="Chat" />
-    <item
         android:id="@+id/user"
         android:icon="@drawable/ic_baseline_account_circle_24"
         android:title="User" />
